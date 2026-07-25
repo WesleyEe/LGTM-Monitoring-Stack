@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-app
+  namespace: observability
+  labels:
+    app: sample-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sample-app
+  template:
+    metadata:
+      labels:
+        app: sample-app
+    spec:
+      containers:
+        - name: log-generator
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              set -- INFO INFO INFO WARN ERROR
+              levels="$@"
+              set -- /checkout /login /cart /inventory /health
+              routes="$@"
+              i=0
+              while true; do
+                i=$((i+1))
+                lidx=$((RANDOM % 5 + 1))
+                ridx=$((RANDOM % 5 + 1))
+                level=$(echo $levels | cut -d' ' -f$lidx)
+                route=$(echo $routes | cut -d' ' -f$ridx)
+                status=200
+                [ "$level" = "ERROR" ] && status=500
+                [ "$level" = "WARN" ] && status=429
+                echo "{\"ts\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",\"level\":\"$level\",\"route\":\"$route\",\"status\":$status,\"seq\":$i,\"msg\":\"handled request\"}"
+                sleep 1
+              done
