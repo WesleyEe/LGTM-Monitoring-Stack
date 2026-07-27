@@ -13,6 +13,12 @@ data:
         url: http://loki.observability.svc.cluster.local:3100
         isDefault: false
         editable: true
+        jsonData:
+          derivedFields:
+            - datasourceUid: tempo
+              matcherRegex: '"trace_id": "(\w+)"'
+              name: TraceID
+              url: "$${__value.raw}"
       - name: Tempo
         type: tempo
         uid: tempo
