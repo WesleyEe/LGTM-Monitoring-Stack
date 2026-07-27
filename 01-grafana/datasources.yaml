@@ -20,3 +20,9 @@ data:
         url: http://tempo.observability.svc.cluster.local:3200
         isDefault: false
         editable: true
+      - name: Prometheus
+        type: prometheus
+        access: proxy
+        url: http://prometheus.observability.svc.cluster.local:9090
+        isDefault: true
+        editable: true
